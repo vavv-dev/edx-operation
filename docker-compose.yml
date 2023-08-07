@@ -1,0 +1,43 @@
+version: "3"
+services:
+  db:
+    image: mysql:8.0
+    container_name: edx_operation.db
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    networks:
+      - devstack_default
+    volumes:
+      - edx_operation_mysql:/var/lib/mysql
+
+  # memcache:
+  #   image: memcached:1.4.24
+  #   container_name: edx_operation.memcache
+
+  app:
+    # Uncomment this line to use the official edx_operation base image
+    # image: openedx/edx_operation
+    build:
+      context: .
+      target: dev
+
+    container_name: edx_operation.app
+    volumes:
+      - .:/edx/app/edx-operation/
+    command: bash -c 'while true; do python /edx/app/edx-operation/manage.py runserver 0.0.0.0:34013; sleep 2; done'
+    environment:
+      DJANGO_SETTINGS_MODULE: edx_operation.settings.devstack
+    ports:
+      - "34013:34013" # TODO: change this to your port
+    networks:
+      - devstack_default
+    depends_on:
+      - db
+
+networks:
+  devstack_default:
+    external: true
+
+volumes:
+  edx_operation_mysql:
