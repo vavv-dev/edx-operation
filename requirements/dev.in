@@ -10,3 +10,4 @@ django-debug-toolbar      # For debugging Django
 black
 isort
 django-stubs
+ipython

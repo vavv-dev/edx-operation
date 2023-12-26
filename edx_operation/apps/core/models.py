@@ -1,21 +1,22 @@
-""" Core models. """
-
 from django.contrib.auth.models import AbstractUser
-from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.db.models import CharField
+
+from .utils.common import random_four_digit
 
 
 class User(AbstractUser):
-    """
-    Custom user model for use with python-social-auth via edx-auth-backends.
+    """User."""
 
-    .. pii: Stores full name, username, and email address for a user.
-    .. pii_types: name, username, email_address
-    .. pii_retirement: local_api
+    class Meta:
+        """Meta."""
 
-    """
+        verbose_name = "사용자"
+        verbose_name_plural = verbose_name
+        get_latest_by = "date_joined"
 
-    full_name = models.CharField(_("Full Name"), max_length=255, blank=True, null=True)
+    full_name = CharField("이름", max_length=255, null=True, blank=True)
+    phone_number = CharField("전화번호", max_length=30, null=True, blank=True)
+    pin_number = CharField("핀번호", max_length=16, null=True, blank=True, default=random_four_digit)
 
     @property
     def access_token(self):
@@ -24,17 +25,14 @@ class User(AbstractUser):
         Assumes user has authenticated at least once with the OAuth2 provider (LMS).
         """
         try:
-            return self.social_auth.first().extra_data[
-                "access_token"
-            ]  # pylint: disable=no-member
+            return self.social_auth.first().extra_data["access_token"]  # pylint: disable=no-member
         except Exception:  # pylint: disable=broad-except
             return None
 
-    class Meta:
-        get_latest_by = "date_joined"
-
     def get_full_name(self):
-        return self.full_name or super().get_full_name()
+        """get_full_name."""
+        return self.full_name or super().get_full_name() or self.username
 
     def __str__(self):
-        return str(self.get_full_name())
+        """__str__."""
+        return self.get_full_name()

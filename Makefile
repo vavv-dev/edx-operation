@@ -74,7 +74,7 @@ lint: ## run Python code linting
 	pylint --rcfile=pylintrc edx_operation *.py
 
 quality:
-	tox -e quality 
+	tox -e quality
 
 pii_check: ## check for PII annotations on all Django models
 	DJANGO_SETTINGS_MODULE=edx_operation.settings.test \
@@ -163,11 +163,17 @@ dev.down: # Kills containers and all of their data that isn't in volumes
 dev.stop: # Stops containers so they can be restarted
 	docker-compose stop
 
+dev.makemigrations:
+	docker exec -u 0 -it edx_operation.app python manage.py makemigrations
+
+dev.migrate:
+	docker exec -u 0 -it edx_operation.app python manage.py migrate
+
 app-shell: # Run the app shell as root
 	docker exec -u 0 -it edx_operation.app bash
 
 db-shell: # Run the app shell as root, enter the app's database
-	docker exec -u 0 -it edx_operation.db mysql -u root edx_operation
+	docker exec -u 0 -it edx_operation.db psql -U postgres -d edx_operation
 
 %-logs: # View the logs of the specified service container
 	docker-compose logs -f --tail=500 $*

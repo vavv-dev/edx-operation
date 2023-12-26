@@ -30,6 +30,8 @@ INSTALLED_APPS = (
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
+    "django.contrib.humanize",
     "release_util",
 )
 
@@ -41,24 +43,70 @@ THIRD_PARTY_APPS = (
     "waffle",
     "openedx_events",
     "drf_spectacular",
-    "notifications",
     "simple_history",
+    "colorfield",
+    "treenode",
+    "django_ace",
+    "crispy_forms",
+    "crispy_bootstrap5",
+)
+
+WAGTAIL_APPS = (
+    "wagtail.contrib.forms",
+    "wagtail.contrib.table_block",
+    "wagtail.contrib.redirects",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail",
+    "modelcluster",
+    "taggit",
 )
 
 PROJECT_APPS = (
-    "edx_operation.apps.core",
     "edx_operation.apps.api",
-    "edx_operation.apps.event",
-    "edx_operation.apps.partner",
+    "edx_operation.apps.core",
+    "edx_operation.apps.event_bus",
     "edx_operation.apps.student",
     "edx_operation.apps.course",
     "edx_operation.apps.enrollment",
     "edx_operation.apps.grade",
-    "edx_operation.apps.notification",
-    "edx_operation.apps.forum",
+    "edx_operation.apps.operation",
+    # using wagtail
+    "edx_operation.apps.wagtail_common",
+    "edx_operation.apps.survey",
+    "edx_operation.apps.catalog",
+    #
+    "edx_operation.apps.course_product",
+    "edx_operation.apps.customer",
+    "edx_operation.apps.accredit",
+    "edx_operation.apps.tutor",
+    "edx_operation.apps.marketer",
+    #
+    "edx_operation.apps.notice",
+    "edx_operation.apps.popup",
+    "edx_operation.apps.post",
+    "edx_operation.apps.vendor",
+    "edx_operation.apps.policy",
+    # "edx_operation.apps.event",
+    #
+    # "edx_operation.apps.manager",
+    #
+    # "edx_operation.apps.comment",
+    # "edx_operation.apps.notification",
+    # "edx_operation.apps.emonitoring",
+    # "edx_operation.apps.certificate",
+    # "edx_operation.apps.report",
+    # "edx_operation.apps.scheduler",
 )
 
 INSTALLED_APPS += THIRD_PARTY_APPS
+INSTALLED_APPS += WAGTAIL_APPS
 INSTALLED_APPS += PROJECT_APPS
 
 MIDDLEWARE = (
@@ -86,6 +134,8 @@ MIDDLEWARE = (
     "edx_rest_framework_extensions.middleware.RequestCustomAttributesMiddleware",
     # Ensures proper DRF permissions in support of JWTs
     "edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware",
+    # wagtail
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 )
 
 # Enable CORS
@@ -235,7 +285,7 @@ LOGIN_REDIRECT_URL = "/admin/"
 
 
 # OPENEDX-SPECIFIC CONFIGURATION
-PLATFORM_NAME = "MOOCKOREA"
+PLATFORM_NAME = "VAVV"
 # END OPENEDX-SPECIFIC CONFIGURATION
 
 # Set up logging for development use (logging to stdout)
@@ -256,38 +306,16 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
-# django notification
-DJANGO_NOTIFICATIONS_CONFIG = {
-    "SOFT_DELETE": True,
-    "USE_JSONFIELD": True,
+CACHES = {
+    "treenode": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    },
 }
-NOTIFICATIONS_NOTIFICATION_MODEL = "notification.StudentNotification"
-NOTIFICATION_WORKER = "notification_worker"
 
-# course modes
-COURSE_MODES = [
-    {
-        "mode_slug": "audit",
-        "mode_display_name": "audit",
-        "min_price": 0,
-        "currency": "usd",
-    },
-    {
-        "mode_slug": "honor",
-        "mode_display_name": "honor",
-        "min_price": 0,
-        "currency": "usd",
-    },
-    {
-        "mode_slug": "verified",
-        "mode_display_name": "verified",
-        "min_price": 100,
-        "currency": "usd",
-    },
-    {
-        "mode_slug": "professional",
-        "mode_display_name": "professional",
-        "min_price": 100,
-        "currency": "usd",
-    },
-]
+# crispy
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# wagtail
+WAGTAIL_SITE_NAME = ""
+WAGTAILADMIN_BASE_URL = ""

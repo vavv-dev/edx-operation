@@ -1,15 +1,16 @@
 version: "3"
 services:
   db:
-    image: mysql:8.0
+    image: postgres
     container_name: edx_operation.db
     environment:
-      MYSQL_ROOT_PASSWORD: ""
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      POSTGRES_DB: edx_operation
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     networks:
       - devstack_default
     volumes:
-      - edx_operation_mysql:/var/lib/mysql
+      - edx_operation_postgresql:/var/lib/postgresql/data
 
   # memcache:
   #   image: memcached:1.4.24
@@ -28,6 +29,9 @@ services:
     command: bash -c 'while true; do python /edx/app/edx-operation/manage.py runserver 0.0.0.0:34013; sleep 2; done'
     environment:
       DJANGO_SETTINGS_MODULE: edx_operation.settings.devstack
+      DB_NAME: edx_operation
+      DB_USER: postgres
+      DB_PASSWORD: postgres
     ports:
       - "34013:34013" # TODO: change this to your port
     networks:
@@ -40,4 +44,4 @@ networks:
     external: true
 
 volumes:
-  edx_operation_mysql:
+  edx_operation_postgresql:

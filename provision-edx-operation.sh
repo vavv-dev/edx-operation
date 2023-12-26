@@ -3,22 +3,16 @@ port="34013"
 
 project_name="edx-operation"
 
-docker-compose up -d --build
+docker-compose up -d
 
 # Install requirements
 # Can be skipped right now because we're using the --build flag on docker-compose. This will need to be changed once we move to devstack.
 
-# Wait for MySQL
-echo "Waiting for MySQL"
-until docker exec -i edx_operation.db mysql -u root -se "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = 'root')" &> /dev/null
-do
-  printf "."
-  sleep 1
-done
-sleep 10
+# wait database contianer up
+sleep 5
 
 # Create the database
-docker exec -i edx_operation.db mysql -u root -se "CREATE DATABASE edx_operation;"
+docker exec -i edx_operation.db psql -U postgres -c "CREATE DATABASE edx_operation;"
 
 # Run migrations
 echo -e "${GREEN}Running migrations for ${name}...${NC}"

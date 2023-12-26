@@ -1,0 +1,163 @@
+{% spaceless %}
+    {% load wagtailimages_tags wagtailcore_tags humanize site_utils %}
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width" />
+            <title>{{ page.title }}</title>
+            <style>
+            {% include "./webfont.css" %}
+            {% include "./a4.css" %}
+            {% include "./main.css" %}
+            {% if page.css %}{{ page.css|safe }}{% endif %}
+            </style>
+        </head>
+        <body>
+            {% for catalog_page in catalog_pages %}
+                {% if catalog_page.page_contents %}
+                    {# contents page #}
+                    <div class="page {% if forloop.counter|divisibleby:2 %}page-even{% endif %}"
+                         style="background-image: url({{ catalog_page.file.url }})">
+                        <div class="contents">
+                            <div class="title">목 차</div>
+                            <div>
+                                {% for title, i in catalog_page.page_contents %}
+                                    <div class="page-item">
+                                        <span>{{ title }}</span><span class="dot"></span><span>{{ i }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="footer">
+                            {% if catalog_page.qrcode %}<img class="qrcode" src="{{ catalog_page.qrcode.url }}" alt="QR"/>{% endif %}
+                            <div class="page-number">
+                                <span class="number">{{ forloop.counter|stringformat:"03d" }}</span>
+                                <span class="dot">·</span>
+                                <span class="catalog-title">{{ page.title }}</span>
+                            </div>
+                            {% if catalog_page.logo %}
+                                {% image catalog_page.logo max-110x48 class="logo" %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% elif catalog_page.file %}
+                    {# image page #}
+                    <div class="page {% if forloop.counter|divisibleby:2 %}page-even{% endif %}"
+                         style="background-image: url({{ catalog_page.file.url }})">
+                    </div>
+                {% else %}
+                    {# course page #}
+                    <div class="page {% if forloop.counter|divisibleby:2 %}page-even{% endif %}"
+                         {% if catalog_page.background %} style="background-image: url({{ catalog_page.background.file.url }});"{% endif %}>
+                        <div class="headline">
+                            <span class="title">교육과정안내</span>
+                            <span>{{ catalog_page.category.0 }}</span>
+                        </div>
+                        <div class="title-block">
+                            <div class="title">
+                                {{ catalog_page.title }}
+                                <div class="tags">
+                                    {% for tag in catalog_page.tags.all %}
+                                        {% if tag.name not in page.exclude_tag_names|default:"" %}
+                                            <span class="tag" style="background-color: {{ tag.color }};">{{ tag.name }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="cover">{% image catalog_page.cover_image fill-200x120 style="border-radius: 16px;" %}</div>
+                        </div>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>과정 정보</th>
+                                    <td>
+                                        {% if catalog_page.training_type %}
+                                            <ul>
+                                                <li>
+                                                    <span class="me-2">유효 기간:</span><span>{{ catalog_page.content_expiration|date:"Y년 m월 d일" }}</span>
+                                                </li>
+                                                <li>
+                                                    <span class="me-2">등급:</span><span>{{ catalog_page.content_grade }}</span>
+                                                </li>
+                                                <li>
+                                                    <span class="me-2">이수 시간:</span><span>{{ catalog_page.training_hours }} 시간</span>
+                                                </li>
+                                                <li>
+                                                    <span class="me-2">훈련 유형:</span><span>{{ catalog_page.training_type }}</span>
+                                                </li>
+                                            </ul>
+                                        {% else %}
+                                            <div>{{ catalog_page.description|default:""|striptags|truncatechars:200 }}</div>
+                                        {% endif %}
+                                    </ul>
+                                </td>
+                                <tr>
+                                    <th>강의 목표</th>
+                                    <td>{{ catalog_page.objective|richtext }}</td>
+                                </tr>
+                                <tr>
+                                    <th>강의 대상</th>
+                                    <td>
+                                        {{ catalog_page.target|richtext }}
+                                    </td>
+                                </tr>
+                            </tr>
+                            <tr>
+                                <th>
+                                    평가 방법
+                                </th>
+                                <td>
+                                    {{ catalog_page.grading|richtext }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    교육 훈련비
+                                </th>
+                                <td class="price">
+                                    <div class="default-price">
+                                        <span>기본 훈련비</span>
+                                        <div>
+                                            {{ catalog_page.price|intcomma }}원
+                                        </div>
+                                    </div>
+                                    <div class="assistances">
+                                        {% for assistance in catalog_page.financial_assistance %}
+                                            <div class="assistance">
+                                                <div class="label">
+                                                    {{ assistance.value.policy }} 지원
+                                                </div>
+                                                {% include_block assistance.value.bound_blocks.benefit %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="content">
+                        <div>
+                            강의 내용
+                        </div>
+                        <p>
+                            {{ catalog_page.contents|richtext }}
+                        </p>
+                    </div>
+                    <div class="footer">
+                        {% if catalog_page.qrcode %}<img class="qrcode" src="{{ catalog_page.qrcode.url }}" alt="QR"/>{% endif %}
+                        <div class="page-number">
+                            <span class="number">{{ forloop.counter|stringformat:"03d" }}</span>
+                            <span class="dot">·</span>
+                            <span class="catalog-title">{{ page.title }}</span>
+                        </div>
+                        {% if catalog_page.logo %}
+                            {% image catalog_page.logo max-110x48 class="logo" %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </body>
+</html>
+{% endspaceless %}

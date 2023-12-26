@@ -2,11 +2,12 @@ FROM ubuntu:22.04 as app
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -qy install --no-install-recommends \
     language-pack-en locales \
-    python3.11 python3-dev python3-pip \
-    # The mysqlclient Python package has install-time dependencies
-    libmysqlclient-dev libssl-dev pkg-config \
-    gcc
+    python3.11 python3.11-dev python3-pip libpq-dev gcc \
+    # weasyprint requirements
+    python3-cffi python3-brotli libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0
 
+# set python3.11 default
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
 
 RUN pip install --upgrade pip setuptools
 # delete apt package lists because we do not need them inflating our image

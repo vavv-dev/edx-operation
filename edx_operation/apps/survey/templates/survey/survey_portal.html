@@ -1,0 +1,54 @@
+{% extends "./base.html" %}
+{% load tz %}
+{% load wagtailcore_tags %}
+{% block extra_head %}
+    <style>
+        th:not(:nth-child(2)), td:not(:nth-child(2)) {
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+{% endblock extra_head %}
+{% block content %}
+    <div class="mb-5">
+        {% if page.content %}
+            {{ page.content }}
+        {% else %}
+            <h1>
+                {% if page.title %}
+                    {{ page.title }}
+                {% else %}
+                    {{ platform_name }} 설문 조사
+                {% endif %}
+            </h1>
+            <p class="lead">{{ platform_name }}에서 진행하는 설문 조사입니다.</p>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>NO</th>
+                    <th>제 목</th>
+                    <th>상 태</th>
+                    <th>응 답</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for survey in surveys %}
+                    <tr>
+                        <td>{{ surveys.paginator.base_no|add:forloop.revcounter }}</td>
+                        <td>
+                            <a href="{% pageurl survey %}?chart=true">{{ survey.title }}</a>
+                            <span class="d-block small">{{ survey.specific.start|date:"Y-m-d" }} ~ {{ survey.specific.end|date:"Y-m-d" }}</span>
+                        </td>
+                        <td>{{ survey.status }}</td>
+                        <td>{{ survey.submission_count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>{% include "./snippets/paginator.html" with paginated=surveys %}</div>
+{% endblock content %}

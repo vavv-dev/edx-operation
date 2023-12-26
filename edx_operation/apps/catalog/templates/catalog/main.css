@@ -1,0 +1,221 @@
+* {
+    font-family: "Noto Sans KR", sans-serif;
+    font-size: 14px;
+}
+
+.page {
+    padding: 4rem 4rem;
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.contents .title {
+    font-size: 24px;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.contents .page-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 40px;
+}
+
+.contents .dot {
+    border-bottom: 2px dotted #bbb;
+    flex-grow: 1;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    height: 12px;
+}
+
+.headline {
+    border-top: 2px solid #dfdfdf;
+    border-bottom: 2px solid #dfdfdf;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.headline span {
+    padding: 3px 8px;
+}
+
+.headline .title {
+    color: white;
+    background-color: rgb(248, 203, 72);
+    padding: 3px 20px;
+}
+
+.title-block {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.title-block .title {
+    flex-grow: 1;
+    font-size: 24px;
+    font-weight: 500;
+    max-width: 400px;
+    word-break: break-all;
+}
+
+.title-block .tags {
+    margin-top: 6px;
+}
+
+.title-block .tag {
+    color: white;
+    font-size: 10px;
+    padding: 3px 5px;
+    border-radius: 4px;
+}
+
+.title-block .tag + .tag {
+    margin-left: 3px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th {
+    min-width: 7rem;
+}
+
+table ul,
+table ol {
+    padding-left: 1em;
+}
+
+table ul,
+table ol,
+table p {
+    margin: 0;
+}
+
+table td {
+    padding: 4px 0;
+}
+
+table tr {
+    border-top: 1px solid #ccc;
+}
+
+.assistances {
+    display: flex;
+    flex-grow: 1;
+}
+
+.assistance {
+    flex-grow: 1;
+}
+
+.assistance .label {
+    text-align: center;
+}
+
+.assistance table {
+    text-align: right;
+}
+
+.assistance table td {
+    font-size: 13px;
+}
+
+.assistance table th {
+    font-size: 13px;
+}
+
+.assistance table thead tr {
+    border: none;
+}
+
+.price {
+    display: flex;
+    align-items: center;
+}
+
+.price .default-price {
+    text-align: center;
+    padding: 2rem;
+}
+
+.content p * {
+    font-size: 13px;
+}
+
+.content ol li {
+    word-break: keep-all;
+}
+
+.content ol {
+    column-count: 2;
+    column-gap: 2rem;
+}
+
+.content ol.small {
+    column-count: 3;
+    padding-left: 2rem;
+}
+
+.content ol.small li {
+    font-size: 12px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 2rem;
+    display: flex;
+    width: 681px; /* calc, 100% not working in weasypritn */
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row-reverse;
+}
+
+.footer .page-number {
+    display: flex;
+    flex-grow: 1;
+    text-align: right;
+    flex-direction: row-reverse;
+}
+
+.footer .page-number .number {
+    font-weight: 700;
+}
+
+.footer .qrcode {
+    height: 48px;
+}
+
+.footer .catalog-title {
+    flex-grow: 1;
+}
+
+.footer .dot {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.footer img + div,
+.footer div + img {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.page-even .headline,
+.page-even .footer,
+.page-even .page-number {
+    flex-direction: row;
+}
+
+.page-even .catalog-title {
+    text-align: left;
+}

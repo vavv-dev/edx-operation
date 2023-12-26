@@ -1,0 +1,128 @@
+{% extends "./base.html" %}
+{% load wagtailcore_tags %}
+{% load crispy_forms_tags %}
+{% block extra_head %}
+    <style>
+        form * {
+            line-height: 2rem;
+        }
+        form > div + div {
+            margin-top: 3rem;
+            border-top: 1px solid #eee !important;
+        }
+        .form-label {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-label::before {
+            content: "Q. ";
+            font-weight: 400;
+        }
+        .form-check-label, .form-select option {
+            color: #646464;
+        }
+        .form-text {
+            color: darkgreen;
+            margin-top: 1rem;
+        }
+    </style>
+{% endblock extra_head %}
+{% block content %}
+    <h2 class="mb-5">{{ page.title }}</h2>
+    <div class="mb-5">
+        {% if submitted %}
+            <div class="my-4">{{ page.outro|richtext }}</div>
+        {% else %}
+            <div class="my-4">{% include_block page.description %}</div>
+        {% endif %}
+        {% if results is not None %}
+            <div>
+                <h3>응답 결과</h3>
+                <ul>
+                    <li>응답자: {{ submission_count }}</li>
+                    <li>기간: {{ page.start }} ~ {{ page.end }}</li>
+                </ul>
+                <div id="chartsContainer" class="my-4 row row-cols-1 row-cols-sm-2 g-4"></div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="survey-box shadow bg-white px-4 px-md-5 py-3">
+        <form id="survey-form" action="{% pageurl page %}" method="post">
+            {% if message %}
+                <h4 class="my-4">{{ message }}</h4>
+                <fieldset disabled>
+                    {{ form|crispy }}
+                </fieldset>
+            {% else %}
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="text-center">
+                    <input type="submit"
+                           form="survey-form"
+                           class="btn btn-lg btn-primary my-5 px-5"
+                           value="제출 하기"/>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+{% endblock content %}
+{% block extra_body %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{ results|json_script:"results" }}
+    <script>
+        {% if page.chart_script %}
+            {{ page.chart_script|safe }}
+        {% else %}
+            const data = JSON.parse(document.querySelector("#results").textContent || "{}");
+            const chartsContainer = document.querySelector("#chartsContainer");
+
+            // card template
+            const card = document.createElement("div");
+            card.classList.add("col");
+            card.innerHTML = '<div class="card shadow-sm"></div>';
+
+            Object.keys(data).forEach((key) => {
+                const labels = Object.keys(data[key]);
+                const values = Object.values(data[key]);
+
+                // chard
+                const canvas = document.createElement("canvas");
+                const chartCard = card.cloneNode();
+                canvas.height = 300;
+                chartCard.appendChild(canvas);
+
+                // Append the canvas to the container
+                chartsContainer.appendChild(canvas);
+
+                // Create a bar chart
+                const ctx = canvas.getContext("2d");
+                new Chart(ctx, {
+                    type: "bar", // pie, bar
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: key,
+                                data: values,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                type: 'linear',
+                                ticks: {
+                                    stepSize: 1,
+                                },
+                            },
+                        },
+                    },
+                });
+            });
+        {% endif %}
+    </script>
+{% endblock extra_body %}

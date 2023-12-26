@@ -1,17 +1,7 @@
 import json
 
 from django.conf import settings
-from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import force_str
-from django.utils.functional import Promise
 from edx_rest_api_client.client import OAuthAPIClient
-
-
-class LazyEncoder(DjangoJSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Promise):
-            return force_str(obj)
-        return super(LazyEncoder, self).default(obj)
 
 
 class BaseAPIClient(OAuthAPIClient):
@@ -29,21 +19,21 @@ class LmsAPIClient(BaseAPIClient):
         super().__init__(**kwargs)
         self.api_root = f"{settings.LMS_BASE_URL}/api"
 
-    def courses_v1_courses_read(self, course_id):
-        api_url = f"{self.api_root}/courses/v1/courses/{course_id}/"
+    def courses_v1_courses_read(self, courserun_id):
+        api_url = f"{self.api_root}/courses/v1/courses/{courserun_id}/"
         response = self.get(api_url)
         response.raise_for_status()
         return response.json()
 
-    def courses_v2_blocks_list(self, course_id, params):
+    def courses_v2_blocks_list(self, courserun_id, params):
         api_url = f"{self.api_root}/courses/v2/blocks/"
-        params = {"course_id": str(course_id), **params}
+        params = {"course_id": str(courserun_id), **params}
         response = self.get(api_url, params=params)
         response.raise_for_status()
         return response.json()
 
-    def course_modes_v1_curses_create(self, course_id, course_modes):
-        api_url = f"{self.api_root}/course_modes/v1/courses/{course_id}/"
+    def course_modes_v1_curses_create(self, courserun_id, course_modes):
+        api_url = f"{self.api_root}/course_modes/v1/courses/{courserun_id}/"
         responses = []
         for mode in course_modes:
             response = self.post(api_url, json=mode)
@@ -58,8 +48,8 @@ class LmsAPIClient(BaseAPIClient):
         response.raise_for_status()
         return response.json()
 
-    def grades_v1_policy_courses_read(self, course_id):
-        api_url = f"{self.api_root}/grades/v1/policy/courses/{course_id}/"
+    def grades_v1_policy_courses_read(self, courserun_id):
+        api_url = f"{self.api_root}/grades/v1/policy/courses/{courserun_id}/"
         response = self.get(api_url)
         response.raise_for_status()
         return response.json()
@@ -90,14 +80,14 @@ class CmsAPIClient(BaseAPIClient):
         response.raise_for_status()
         return response.json()
 
-    def v1_course_runs_rerun(self, course_id, payload):
-        api_url = f"{self.api_root}/v1/course_runs/{course_id}/rerun/"
+    def v1_course_runs_rerun(self, courserun_id, payload):
+        api_url = f"{self.api_root}/v1/course_runs/{courserun_id}/rerun/"
         response = self.post(api_url, json=payload)
         response.raise_for_status()
         return response.json()
 
-    def courses_v0_import_create(self, course_id, file):
-        api_url = f"{self.api_root}/courses/v0/import/{course_id}/"
+    def courses_v0_import_create(self, courserun_id, file):
+        api_url = f"{self.api_root}/courses/v0/import/{courserun_id}/"
         response = self.post(api_url, files={"course_data": file})
         response.raise_for_status()
         return response.json()

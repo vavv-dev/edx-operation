@@ -1,3 +1,4 @@
+import logging
 from os import environ
 
 import yaml
@@ -55,3 +56,6 @@ DB_OVERRIDES = dict(
 
 for override, value in DB_OVERRIDES.items():
     DATABASES["default"][override] = value
+
+# disable Pil logging
+logging.getLogger("PIL.PngImagePlugin").propagate = False

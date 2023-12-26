@@ -1,7 +1,7 @@
 # Core requirements for using this application
 -c constraints.txt
 
-Django         # Web application framework
+Django==4.2         # Web application framework
 django-cors-headers
 django-extensions
 django-waffle
@@ -11,14 +11,28 @@ edx-django-utils
 edx-django-release-util
 edx-drf-extensions
 edx-rest-api-client
-mysqlclient
 pytz
 
 confluent_kafka[avro,schema-registry]
-edx-event-bus-kafka
-openedx-events
-drf_spectacular
-pillow
+crispy-bootstrap5
 cryptography
+django-colorfield
+django-crispy-forms
 django-notifications-hq
 django-simple-history
+django-taggit
+django-treenode
+django_ace
+drf_spectacular
+edx-event-bus-kafka
+lxml
+openedx-events
+openpyxl
+pillow
+psycopg[c]
+pycryptodome
+python-dateutil
+tzdata
+wagtail
+weasyprint
+xlrd

@@ -1,74 +1,54 @@
-from django.conf import settings
-from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.db.models import (
+    BigIntegerField,
+    BooleanField,
+    CharField,
+    DateTimeField,
+    EmailField,
+)
 from django_extensions.db.models import TimeStampedModel
 
-from edx_operation.apps.api_client.jwt import LmsAPIClient
+from edx_operation.apps.core.constants import GENDER_CHOICES
+from edx_operation.apps.core.utils.common import (
+    Validator,
+    encrypt_id_number,
+    random_four_digit,
+)
 
 
 class Student(TimeStampedModel):
     class Meta:
-        verbose_name = _("Student")
-        verbose_name_plural = _("Students")
+        verbose_name = "학습자"
+        verbose_name_plural = verbose_name
 
-    GENDER_CHOICES = (("f", "여성"), ("m", "남성"))
+    # fmt: off
 
-    username = models.CharField(max_length=100, null=True, blank=True, unique=True)
-    email = models.EmailField(null=True, blank=True)
-    is_active = models.BooleanField(null=True, blank=True)
-    is_staff = models.BooleanField(null=True, blank=True)
-    is_superuser = models.BooleanField(null=True, blank=True)
-    date_joined = models.DateTimeField(null=True, blank=True)
-    last_login = models.DateTimeField(null=True, blank=True)
+    id = CharField("사용자 이름", max_length=100, primary_key=True)
+    email = EmailField("이매일", null=True, blank=True)
 
-    name = models.CharField(max_length=255, null=True, blank=True)
-    id_number = models.CharField(max_length=255, null=True, blank=True)
-    year_of_birth = models.CharField(max_length=10, null=True, blank=True)
-    birthday = models.CharField(max_length=10, null=True, blank=True)
-    gender = models.CharField(max_length=10, null=True, blank=True, choices=GENDER_CHOICES)
-    cellphone = models.CharField(max_length=50, null=True, blank=True)
+    name = CharField("이름", max_length=255, null=True, blank=True)
+    year_of_birth = CharField("생년월일", max_length=10, null=True, blank=True, validators=[Validator.validate_year_of_birth])
+    birthday = CharField("생년월일", max_length=10, null=True, blank=True, validators=[Validator.validate_birthday])
+    gender = CharField("성별", max_length=10, null=True, blank=True, choices=GENDER_CHOICES)
+    cellphone = CharField("휴대폰", max_length=50, null=True, blank=True, validators=[Validator.validate_cellphone])
+    id_number = CharField("주민등록번호", max_length=255, null=True, blank=True)
 
-    @property
-    def decrypted_id_number(self):
-        return settings.cipher_suite.decrypt(self.id_number).decode()
+    initial_password = CharField("패스워드", max_length=100, null=True, blank=True)
+    password_change_required = BooleanField("패스워드 변경 안내", default=False)
+    pin_number = CharField("핀번호", max_length=16, null=True, blank=True, default=random_four_digit)
 
-    @property
-    def initial_password(self):
-        password = InitialPassword.objects.filter(username=self.username).last()
-        return password.password if password else None
+    # lms info
+    is_active = BooleanField("활성", default=False)
+    is_staff = BooleanField("스태프", null=True, blank=True)
+    is_superuser = BooleanField("수퍼유저", null=True, blank=True)
+    date_joined = DateTimeField("가입", null=True, blank=True)
+    last_login = DateTimeField("마지막 로그인", null=True, blank=True)
+
+    # fmt: on
 
     def set_id_number(self, id_number):
-        self.id_number = settings.cipher_suite.encrypt(id_number.encode())
+        Validator.validate_id_number(id_number)
+        self.id_number = encrypt_id_number(id_number)
 
     def check_id_number(self, id_number):
-        return self.decrypted_id_number == id_number
-
-    @classmethod
-    def register(cls, name, username, email, year_of_birth, initial_password):
-        payload = {
-            "name": name,
-            "username": username,
-            "email": email,
-            "year_of_birth": year_of_birth,
-            "password": initial_password,
-            "country": "KR",
-            "honor_code": True,
-        }
-
-        # create user
-        LmsAPIClient().user_v1_account_registration_create(payload)
-
-        # save initial_password
-        InitialPassword.objects.update_or_create(
-            username=username,
-            defaults={"password": initial_password},
-        )
-
-
-class InitialPassword(TimeStampedModel):
-    class Meta:
-        verbose_name = _("Initial Password")
-        verbose_name_plural = _("Initial Passwords")
-
-    username = models.CharField(max_length=100, unique=True)
-    password = models.CharField(max_length=100)
+        Validator.validate_id_number(id_number)
+        return self.id_number == encrypt_id_number(id_number)
