@@ -14,3 +14,16 @@ def global_admin_js():
             });
         </script>
     """
+
+
+@hooks.register("register_rich_text_features", order=10)
+def register_rich_text_features(features):
+    default_features = features.default_features
+
+    if "h1" not in default_features and "h2" in default_features:
+        default_features.insert(default_features.index("h2"), "h1")
+
+    extends = ["superscript", "subscript", "strikethrough", "code", "blockquote"]
+    for tag in extends:
+        if tag not in default_features:
+            default_features.append(tag)

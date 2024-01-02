@@ -8,7 +8,6 @@ from django.db.models import (
     OneToOneField,
 )
 from django_extensions.db.models import TimeStampedModel
-from wagtail.snippets.models import register_snippet
 
 from edx_operation.apps.core.constants import MARKETER_PERM
 from edx_operation.apps.core.models import User

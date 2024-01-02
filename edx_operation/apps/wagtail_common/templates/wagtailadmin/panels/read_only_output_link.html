@@ -1,0 +1,15 @@
+{# inherted from wagtailadmin/panels/read_only_output.html #}
+{% load site_utils %}
+<div class="w-field__textoutput"
+     role="textbox"
+     tabindex="0"
+     aria-labelledby="{{ id_for_label }}-label"
+     {% if help_text %} aria-describedby="{{ help_text_id }}"{% endif %}
+     aria-readonly="true">
+    {% if display_value != "None" %}
+        {% for name, path in display_value reversed %}
+            <a target="_blank" href="{{ path }}">{{ name }}</a>
+            <br />
+        {% endfor %}
+    {% endif %}
+</div>

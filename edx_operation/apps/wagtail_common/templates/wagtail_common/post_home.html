@@ -1,0 +1,85 @@
+{% extends "wagtail_common/base.html" %}
+{% load wagtailcore_tags %}
+{% load render_table from django_tables2 %}
+{% block extra_head %}
+    {{ block.super }}
+{% endblock extra_head %}
+{% block content %}
+    <div class="breadcrumb my-5">{% include "wagtail_common/snippets/breadcrumb.html" %}</div>
+    <h1 class="title my-5">{{ page.title }}</h1>
+    {% if page.content %}<div class="content my-5">{{ page.content|richtext }}</div>{% endif %}
+    <div class="search my-5">
+        <div class="row">
+            <div class="col-10 col-sm-8 col-md-6 mx-auto">
+                <form method="get"
+                      action="{% pageurl page %}"
+                      class="input-group search-form">
+                    <input class="form-control border-end-0 border rounded-0 shadow-none"
+                           type="search"
+                           name="search"
+                           placeholder="제목, 내용, 태그, 날짜에서 검색합니다."
+                           value="{{ request.GET.search }}"
+                           autocomplete="off"/>
+                    <span class="input-group-append">
+                        <button class="p-2 px-3 btn btn-outline-primary border border-start-0 rounded-0"
+                                type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </span>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="tables2 my-5">
+        {% include "wagtail_common/snippets/per_page.html" %}
+        {% render_table post_table %}
+    </div>
+{% endblock content %}
+{% block extra_body %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function (e) {
+          // safe url update
+          function safeUrlUpdate(term, value) {
+            // Get the current URL and search parameters
+            const url = new URL(window.location.href);
+            const searchParams = new URLSearchParams(url.search);
+
+            // Update or add the 'search' parameter
+            value ? searchParams.set(term, value) : searchParams.delete(term);
+
+            // Update the URL with the new search parameters
+            url.search = searchParams.toString();
+            return url.toString();
+          }
+
+          // url retained search
+          document.querySelectorAll(".search-form").forEach(function (form) {
+            form.addEventListener("submit", function (e) {
+              e.preventDefault();
+              window.location.href = safeUrlUpdate("search", this.search.value);
+            });
+          });
+
+          // better cursor position on focus
+          document.querySelectorAll('[name="search"]').forEach(function (search) {
+            search.addEventListener("focus", function (e) {
+              e.preventDefault();
+              // move cursor
+              this.setSelectionRange(0, this.value.length);
+              this.selectionStart = this.selectionEnd = this.value.length;
+            });
+            search.focus();
+          });
+
+          // per_page
+          document.querySelectorAll(".per-page-select").forEach(function (select) {
+            select.addEventListener("change", function (e) {
+              e.preventDefault();
+              const value = this.value == "25" ? null : this.value;
+              window.location.href = safeUrlUpdate("per_page", value);
+            });
+          });
+        });
+    </script>
+    {{ block.super }}
+{% endblock extra_body %}

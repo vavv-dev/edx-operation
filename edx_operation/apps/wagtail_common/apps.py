@@ -8,3 +8,8 @@ class WagtailCommonConfig(AppConfig):
 
     def ready(self) -> None:
         from . import wagtail_hooks
+
+        # magic: postgresql partial matching
+        from wagtail.search.backends.database.postgres.postgres import PostgresSearchQueryCompiler
+
+        PostgresSearchQueryCompiler.LAST_TERM_IS_PREFIX = True

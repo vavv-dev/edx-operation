@@ -1,30 +1,39 @@
 from colorfield.fields import ColorField
-from django.db.models import DateTimeField
-from wagtail.admin.panels import FieldPanel, FieldRowPanel, MultiFieldPanel
-from wagtail.snippets.models import register_snippet
+from wagtail.admin.panels import FieldPanel, HelpPanel, MultiFieldPanel
 
-from edx_operation.apps.wagtail_common.mixin import BasePostMixin
+from edx_operation.apps.wagtail_common.models import AbstractPostHome, AbstractPostPage
 
 
-@register_snippet
-class Popup(BasePostMixin):
+class PopupHome(AbstractPostHome):
     class Meta:
         verbose_name = "팝업"
         verbose_name_plural = verbose_name
 
-    # addtional fields
-    start = DateTimeField("게시 시작")
-    end = DateTimeField("게시 종료")
+    subpage_types = ["PopupPage"]
+    template = "wagtail_common/post_home.html"
+
+
+class PopupPage(AbstractPostPage):
+    class Meta:
+        verbose_name = "팝업"
+        verbose_name_plural = verbose_name
+
+    parent_page_types = ["PopupHome"]
+    subpage_types = []
+    template = "wagtail_common/post_page.html"
+
     background_color = ColorField("배경색", default="#FAFAFA", format="hexa")
 
-    panels = (
-        BasePostMixin.top_panels
-        + [
-            MultiFieldPanel(
-                [FieldRowPanel([FieldPanel("start"), FieldPanel("end")])],
-                heading="게시 기간",
-            ),
-            FieldPanel("background_color"),
-        ]
-        + BasePostMixin.bottom_panels
-    )
+    content_panels = AbstractPostPage.content_panels + [
+        MultiFieldPanel(
+            [
+                HelpPanel("오른쪽 상단에 있는 info 버튼을 클릭한 후 팝업 종료 기간을 입력하세요."),
+            ],
+            heading="팝업 기간",
+        ),
+        FieldPanel("background_color"),
+    ]
+
+    def clean(self):
+        # TODO 팝업 종료 기간 확인
+        pass

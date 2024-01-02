@@ -169,6 +169,9 @@ dev.makemigrations:
 dev.migrate:
 	docker exec -u 0 -it edx_operation.app python manage.py migrate
 
+dev.provision:
+	docker exec -u 0 -it edx_operation.app python manage.py initialize_pages
+
 app-shell: # Run the app shell as root
 	docker exec -u 0 -it edx_operation.app bash
 

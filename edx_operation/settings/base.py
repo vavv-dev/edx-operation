@@ -32,6 +32,7 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.postgres",
     "django.contrib.humanize",
+    "django.contrib.sites",
     "release_util",
 )
 
@@ -44,11 +45,16 @@ THIRD_PARTY_APPS = (
     "openedx_events",
     "drf_spectacular",
     "simple_history",
+    "hitcount",
     "colorfield",
     "treenode",
     "django_ace",
     "crispy_forms",
     "crispy_bootstrap5",
+    "django_tables2",
+    "star_ratings",
+    "django_comments_xtd",
+    "django_comments",
 )
 
 WAGTAIL_APPS = (
@@ -77,32 +83,35 @@ PROJECT_APPS = (
     "edx_operation.apps.enrollment",
     "edx_operation.apps.grade",
     "edx_operation.apps.operation",
-    # using wagtail
-    "edx_operation.apps.wagtail_common",
-    "edx_operation.apps.survey",
-    "edx_operation.apps.catalog",
-    #
-    "edx_operation.apps.course_product",
-    "edx_operation.apps.customer",
     "edx_operation.apps.accredit",
-    "edx_operation.apps.tutor",
-    "edx_operation.apps.marketer",
-    #
-    "edx_operation.apps.notice",
-    "edx_operation.apps.popup",
-    "edx_operation.apps.post",
-    "edx_operation.apps.vendor",
-    "edx_operation.apps.policy",
-    # "edx_operation.apps.event",
-    #
-    # "edx_operation.apps.manager",
-    #
-    # "edx_operation.apps.comment",
-    # "edx_operation.apps.notification",
-    # "edx_operation.apps.emonitoring",
+    "edx_operation.apps.comments_xtd",
+    # "edx_operation.apps.copy_scan",
     # "edx_operation.apps.certificate",
     # "edx_operation.apps.report",
+    #
+    # "edx_operation.apps.notification",
     # "edx_operation.apps.scheduler",
+    # "edx_operation.apps.emonitoring",
+    #
+    # content
+    "edx_operation.apps.wagtail_common",
+    "edx_operation.apps.notice",
+    "edx_operation.apps.news",
+    "edx_operation.apps.blog",
+    "edx_operation.apps.popup",
+    "edx_operation.apps.policy",
+    "edx_operation.apps.partner",
+    "edx_operation.apps.program",
+    "edx_operation.apps.survey",
+    "edx_operation.apps.catalog",
+    "edx_operation.apps.industry",
+    "edx_operation.apps.customer",  # TODO
+    "edx_operation.apps.tutor",  # TODO
+    "edx_operation.apps.marketer",  # TODO
+    # portal
+    "edx_operation.apps.portal",
+    # "edx_operation.apps.manager",
+    # "edx_operation.apps.learning",
 )
 
 INSTALLED_APPS += THIRD_PARTY_APPS
@@ -178,7 +187,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-LOCALE_PATHS = (root("conf", "locale"),)
+# add comments_xtd
+LOCALE_PATHS = (
+    root("apps/comments_xtd/django_comments_xtd/conf", "locale"),
+    root("conf", "locale"),
+)
 
 
 # MEDIA CONFIGURATION
@@ -198,7 +211,10 @@ STATIC_ROOT = root("assets")
 STATIC_URL = "/static/"
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = (root("static"),)
+STATICFILES_DIRS = (
+    root("apps/comments_xtd/django_comments_xtd/static"),
+    root("static"),
+)
 
 # TEMPLATE CONFIGURATION
 # See: https://docs.djangoproject.com/en/3.2/ref/settings/#templates
@@ -218,6 +234,8 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "edx_operation.apps.core.context_processors.core",
+                # django-tables2
+                "django.template.context_processors.request",
             ),
             "debug": True,  # Django will only display debug pages if the global DEBUG setting is set to True.
         },
@@ -230,13 +248,14 @@ TEMPLATES = [
 # The purpose of customizing the cookie names is to avoid conflicts when
 # multiple Django services are running behind the same hostname.
 # Detailed information at: https://docs.djangoproject.com/en/dev/ref/settings/
-SESSION_COOKIE_NAME = "edx_operation_sessionid"
-CSRF_COOKIE_NAME = "edx_operation_csrftoken"
-LANGUAGE_COOKIE_NAME = "edx_operation_language"
+SESSION_COOKIE_NAME = "sessionid"
+CSRF_COOKIE_NAME = "csrftoken"
+LANGUAGE_COOKIE_NAME = "language"
 # END COOKIE CONFIGURATION
 
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
+CSRF_COOKIE_HTTPONLY = False
 
 # AUTHENTICATION CONFIGURATION
 LOGIN_URL = "/login/"
@@ -319,3 +338,46 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # wagtail
 WAGTAIL_SITE_NAME = ""
 WAGTAILADMIN_BASE_URL = ""
+
+# hitcount
+HITCOUNT_KEEP_HIT_ACTIVE = {"hours": 1}
+
+# start-rating
+STAR_RATINGS_STAR_HEIGHT = 24
+
+# sites
+SITE_ID = 1
+
+COMMENTS_APP = "django_comments_xtd"
+COMMENTS_XTD_MAX_THREAD_LEVEL = 1
+COMMENTS_XTD_MAX_THREAD_LEVEL_BY_APP_MODEL = {}
+COMMENTS_XTD_CONFIRM_EMAIL = False
+COMMENTS_XTD_LIST_ORDER = ("-thread_id", "order")
+COMMENTS_XTD_APP_MODEL_OPTIONS = {
+    "default": {
+        "allow_flagging": False,
+        "allow_feedback": True,
+        "show_feedback": True,
+        "who_can_post": "users",  # Valid values: 'all', users'
+    }
+}
+COMMENTS_XTD_API_GET_USER_AVATAR = "edx_operation.apps.comments_xtd.utils.get_user_avatar"
+
+# edx_operation
+EDX_OPERATION_SITES = (
+    ("portal.PORTAL", "포털"),
+    # ("manager.Manager", "매니저"),
+    # ("learning.Leanring", "사이버연수원"),
+)
+EDX_OPERATION_HOME_PAGES = (
+    ("notice.NoticeHome", "알림"),
+    ("news.NewsHome", "뉴스"),
+    ("blog.BlogHome", "블로그"),
+    ("popup.PopupHome", "팝업"),
+    ("policy.PolicyHome", "이용 규정"),
+    ("partner.PartnerHome", "파트너"),
+    ("program.ProgramHome", "프로그램"),
+    ("survey.SurveyHome", "설문조사"),
+    ("catalog.CatalogHome", "카탈로그"),
+    ("industry.IndustryHome", "교육 분야"),
+)

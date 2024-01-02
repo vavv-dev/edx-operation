@@ -90,3 +90,5 @@ docs/_build/
 
 #transifex exe
 tx
+
+**/node_modules

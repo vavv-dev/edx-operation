@@ -1,0 +1,79 @@
+{% extends "wagtail_common/base.html" %}
+{% load wagtailcore_tags static ratings comments comments_xtd %}
+{% block extra_head %}
+    <link rel="stylesheet"
+          href="{% static 'star-ratings/css/star-ratings.css' %}"/>
+    {{ block.super }}
+{% endblock extra_head %}
+{% block content %}
+    <div class="breadcrumb my-5">{% include "wagtail_common/snippets/breadcrumb.html" %}</div>
+    <h1 class="title my-5">{{ page.title }}</h1>
+    <div class="ratings my-5">
+        {# fix preview mode #}
+        {% if page.pk %}
+            {% ratings page %}
+        {% endif %}
+    </div>
+    <div class="tags my-5">
+        {% for tag in page.tags.all %}
+            <span class="badge" style="background-color: {{ tag.color }}">{{ tag.name }}</span>
+        {% endfor %}
+    </div>
+    <ul class="information my-5">
+        <li class="modified">게시: {{ page.first_published_at }}</li>
+        <li class="modified">수정: {{ page.last_published_at }}</li>
+        <li class="hitcount">조회: {{ page.hit_count.hits }}</li>
+    </ul>
+    <div class="content my-5">{{ page.content }}</div>
+    {% block child_content %}
+    {% endblock child_content %}
+    <ul class="navigation my-5">
+        {% with page.get_prev_siblings.live.first as prev %}
+            {% if prev %}
+                <li>
+                    <a href="{% pageurl prev %}">이전 글: {{ prev.title }}</a>
+                </li>
+            {% endif %}
+        {% endwith %}
+        <li>
+            <a href="{% pageurl page.get_parent %}">{{ page.get_parent.title }} 목록 보기</a>
+        </li>
+        {% with page.get_next_siblings.live.first as next %}
+            {% if next %}
+                <li>
+                    <a href="{% pageurl next %}">다음 글: {{ next.title }}</a>
+                </li>
+            {% endif %}
+        {% endwith %}
+    </ul>
+    {% if page.allow_comments %}
+        <div class="comments my-5">
+            <div id="comments"></div>
+        </div>
+    {% endif %}
+{% endblock content %}
+{% block extra_body %}
+    <script src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
+    {% if page.pk and page.allow_comments %}
+        <script>
+           window.comments_props = {% get_commentbox_props for page %};
+           window.comments_props_override = {
+             allow_comments: true,
+             allow_feedback: true,
+             show_feedback: true,
+             allow_flagging: false,
+             polling_interval: 30 * 1000,
+           };
+        </script>
+        <script src="{% url 'javascript-catalog' %}"></script>
+        <script src="{% static 'django_comments_xtd/js/django-comments-xtd-2.9.13.min.js' %}"></script>
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(tooltipTriggerEl) {
+              new bootstrap.Tooltip(tooltipTriggerEl, { html: true });
+            });
+          });
+        </script>
+    {% endif %}
+    {{ block.super }}
+{% endblock extra_body %}

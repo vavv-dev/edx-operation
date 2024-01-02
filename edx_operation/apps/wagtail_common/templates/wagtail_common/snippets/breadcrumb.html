@@ -1,0 +1,11 @@
+{% if page.get_ancestors|length > 1 %}
+    <ol class="breadcrumb">
+        {% for ancester in page.get_ancestors %}
+            {% if not ancester.is_root %}
+                <li class="breadcrumb-item">
+                    <a href="{{ ancester.url }}">{{ ancester.title }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+{% endif %}

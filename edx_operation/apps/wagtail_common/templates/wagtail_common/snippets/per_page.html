@@ -1,0 +1,9 @@
+{% load site_utils %}
+<select class="per-page-select border-0 form-select form-select-sm w-auto ms-auto mb-2">
+    {% for value in "10,25,50,100"|split %}
+        <option value="{{ value }}"
+                {% if request.GET.per_page == value %} selected {% elif value == "25" and not request.GET.per_page %} selected {% endif %}>
+            {{ value }}개
+        </option>
+    {% endfor %}
+</select>

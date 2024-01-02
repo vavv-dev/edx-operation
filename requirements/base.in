@@ -17,9 +17,13 @@ confluent_kafka[avro,schema-registry]
 crispy-bootstrap5
 cryptography
 django-colorfield
+django-comments-xtd
 django-crispy-forms
+django-hitcount
 django-notifications-hq
 django-simple-history
+django-star-ratings
+django-tables2
 django-taggit
 django-treenode
 django_ace

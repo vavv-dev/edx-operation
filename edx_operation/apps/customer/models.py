@@ -9,20 +9,22 @@ from django.db.models import (
 )
 from django.db.models.fields import BooleanField
 from django_extensions.db.models import TimeStampedModel
-from edx_operation.apps.core.utils.common import random_four_digit
+from wagtail.search.index import AutocompleteField, Indexed, SearchField
+from wagtail.snippets.models import register_snippet
 
+from edx_operation.apps.core.utils.common import random_four_digit
 from edx_operation.apps.enrollment.models import Enrollment
 from edx_operation.apps.student.models import Student
 
 
-class Customer(TimeStampedModel):
+class Customer(TimeStampedModel, Indexed):
     class Meta:
         verbose_name = "고객사"
         verbose_name_plural = verbose_name
 
     # fmt: off
 
-    name = CharField("고객사", max_length=255)
+    name = CharField("고객사", max_length=255, db_index=True)
     slug = SlugField("슬러그", max_length=255, unique=True)
     logo = ImageField("로고", max_length=255, null=True, blank=True)
     email = EmailField("이메일", null=True, blank=True)
@@ -40,6 +42,14 @@ class Customer(TimeStampedModel):
     enrollments = ManyToManyField(Enrollment, through="CustomerEnrollment", blank=True, verbose_name="수강")
 
     # fmt: on
+
+    search_fields = (
+        SearchField("name"),
+        AutocompleteField("name"),
+    )
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class CustomerStudent(TimeStampedModel):

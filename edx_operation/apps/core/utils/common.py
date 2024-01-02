@@ -13,6 +13,7 @@ from dateutil import parser
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import IntegerField, Subquery
 from django.utils.timezone import localtime
 
 ID_NUMBER_ENCRYPTION_KEY = getattr(settings, "ID_NUMBER_ENCRYPTION_KEY", b"secureencryption")
@@ -139,3 +140,8 @@ def paginate(objs, page, per_page):
         (paginator.count or 0) - int(per_page) * (objs.number - 1) - len(objs.object_list),
     )
     return objs
+
+
+class SubqueryCount(Subquery):
+    template = "(SELECT count(*) FROM (%(subquery)s) _count)"
+    output_field = IntegerField()

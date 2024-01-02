@@ -93,3 +93,13 @@ EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = "edx.devstack.kafka:29092"
 # id number encryption
 # Fernet.generate_key()
 cipher_suite = Fernet(b"SWZ1eZKlH2xfiIO8sx0FMW5Zg-NEIA_8LEFZoA87mY0=")
+
+# sql log
+# LOGGING["loggers"]["django.db.backends"] = {
+#     "handlers": ["console"],
+#     "level": "DEBUG",
+# }
+
+# edx_operation
+EDX_OPERATION_DOMAIN = "localhost"
+EDX_OPERATION_PORT = 34013

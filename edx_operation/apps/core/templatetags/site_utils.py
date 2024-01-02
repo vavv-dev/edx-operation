@@ -12,3 +12,8 @@ def url_add_query(url, **kwargs):
     querystring = QueryDict(parsed.query, mutable=True).dict()
     querystring.update(kwargs)
     return urlunsplit(parsed._replace(query=urlencode(querystring)))
+
+
+@register.filter
+def split(value, delimiter=","):
+    return value.split(delimiter)
